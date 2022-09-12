@@ -27,7 +27,7 @@ export const getSecretsValuesFromAwsSecretManager = async () => {
   });
   const response = await secretsManager
     .getSecretValue({
-      SecretId: 'dev/NestApp/MySQL',
+      SecretId: process.env.RDS_SECRET_NAME,
     })
     .promise();
 
