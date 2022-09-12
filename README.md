@@ -1,14 +1,16 @@
-# Welcome to your CDK TypeScript project
+# AWS Practice App
+## Used AWS Services List
+- VPC
+- EC2
+- IAM
+- RDS
+- RDS Proxy
+- Lambda
+- API Gateway
+- Secrets Manager
+- CloudFormation
+- CloudWatch
 
-This is a blank project for CDK development with TypeScript.
-
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
-
-## Useful commands
-
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+## App Framework, Language
+- Nest.js
+- TypeScript
