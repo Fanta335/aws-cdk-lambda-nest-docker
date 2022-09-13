@@ -7,7 +7,6 @@ import {
   APIGatewayProxyEvent,
   Context,
   APIGatewayProxyResult,
-  Handler,
 } from 'aws-lambda';
 import * as mysql from 'mysql2/promise';
 import * as AWS from 'aws-sdk';
@@ -33,6 +32,15 @@ const bootstrapServer = async (event: any, context: any) => {
   serverlessExpressInstance = serverlessExpress({ app: expressApp });
   return serverlessExpressInstance(event, context);
 };
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.enableCors();
+
+  await app.listen(3000);
+}
+
+// bootstrap();
 
 export const handler = async (
   event: APIGatewayProxyEvent,
@@ -83,11 +91,3 @@ export const handler = async (
   //   body: JSON.stringify(result[0]),
   // };
 };
-
-// async function bootstrap() {
-//   const app = await NestFactory.create(AppModule);
-//   app.enableCors();
-
-//   await app.listen(3000);
-// }
-// bootstrap();
