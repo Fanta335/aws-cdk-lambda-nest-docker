@@ -14,6 +14,16 @@ export class CatsService {
     return this.catsRepository.find();
   }
 
+  findById(id: number) {
+    return this.catsRepository.findOne({ where: { id: id } });
+  }
+
+  async updateCat(id: number, name: string) {
+    const catToBeUpdated = await this.findById(id);
+    catToBeUpdated.name = name;
+    return this.catsRepository.save(catToBeUpdated);
+  }
+
   createCat(name: string) {
     return this.catsRepository.save({ name });
   }
