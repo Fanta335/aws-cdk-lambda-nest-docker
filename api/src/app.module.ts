@@ -10,7 +10,7 @@ import { Cat } from './cats/cat.entity';
   imports: [
     TypeOrmModule.forRootAsync({
       useFactory: async () => {
-        const { username, password, engine, host, port, dbname, cert } =
+        const { username, password, engine, port, dbname, cert } =
           await getSecretsValuesFromAwsSecretManager();
         return {
           type: engine,
@@ -31,7 +31,7 @@ import { Cat } from './cats/cat.entity';
     //   useFactory: async () => {
     //     return {
     //       type: 'mysql',
-    //       host: '127.0.0.1',
+    //       host: 'localhost',
     //       port: 3306,
     //       username: 'root',
     //       password: '',
