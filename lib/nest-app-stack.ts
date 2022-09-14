@@ -69,6 +69,7 @@ export class NestAppStack extends Stack {
 
     // S3
     const s3Bucket = new s3.Bucket(this, "Bucket", {
+      bucketName: id.toLowerCase() + "-bucket",
       publicReadAccess: true,
     });
 
@@ -165,7 +166,8 @@ export class NestAppStack extends Stack {
       environment: {
         NODE_OPTIONS: "--enable-source-maps",
         PROXY_ENDPOINT: proxy.endpoint,
-        RDS_SECRET_NAME: id + "-rds-credentials",
+        RDS_SECRET_NAME: databaseCredentialsSecret.secretName,
+        IAM_SECRET_NAME: iamUserForS3CredentialsSecret.secretName,
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
       },
       memorySize: 128,
