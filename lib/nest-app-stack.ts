@@ -5,10 +5,13 @@ import {
   Duration,
   aws_rds as rds,
   aws_ec2 as ec2,
+  aws_s3 as s3,
   aws_iam as iam,
   aws_secretsmanager as secrets,
   aws_lambda as lambda,
   aws_apigateway as apigw,
+  SecretValue,
+  CfnOutput,
 } from "aws-cdk-lib";
 import { Construct } from "constructs";
 
@@ -63,6 +66,35 @@ export class NestAppStack extends Stack {
       },
     });
     host.instance.addUserData("yum -y update", "yum install -y mysql jq");
+
+    // S3
+    const s3Bucket = new s3.Bucket(this, "Bucket", {
+      publicReadAccess: true,
+    });
+
+    // S3を操作するためのIAMユーザー
+    const iamUserForS3 = new iam.User(this, "iamUserForS3", {
+      userName: id + "-s3-admin",
+      managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonS3FullAccess")],
+    });
+    const accessKey = new iam.CfnAccessKey(this, "accessKey", {
+      userName: iamUserForS3.userName,
+    });
+    const secretAccessKey = accessKey.attrSecretAccessKey;
+
+    // IAMユーザーの認証情報
+    const iamUserForS3CredentialsSecret = new secrets.Secret(this, "iamUserForS3CredentialsSecret", {
+      secretName: id + "-iam-user-for-s3-credentials",
+      secretObjectValue: {
+        username: SecretValue.unsafePlainText(iamUserForS3.userName),
+        accessKey: SecretValue.unsafePlainText(accessKey.ref),
+        secretAccessKey: SecretValue.unsafePlainText(secretAccessKey),
+      },
+    });
+
+    // 確認用
+    new CfnOutput(this, "access_key", { value: accessKey.ref });
+    new CfnOutput(this, "secret_access_key", { value: secretAccessKey });
 
     // RDSの認証情報
     const databaseCredentialsSecret = new secrets.Secret(this, "DBCredentialsSecret", {
@@ -139,8 +171,9 @@ export class NestAppStack extends Stack {
       memorySize: 128,
     });
 
-    // Lambda関数がRDS認証情報へアクセスすることを許可
+    // Lambda関数がRDSとIAMの認証情報へアクセスすることを許可
     databaseCredentialsSecret.grantRead(nestAppLambdaFunction);
+    iamUserForS3CredentialsSecret.grantRead(nestAppLambdaFunction);
 
     // Lambda関数からSecret ManagerにアクセスするためのVPCエンドポイント
     new ec2.InterfaceVpcEndpoint(this, "SecretManagerVpcEndpoint", {
