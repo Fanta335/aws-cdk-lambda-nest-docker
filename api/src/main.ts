@@ -8,8 +8,6 @@ import {
   Context,
   APIGatewayProxyResult,
 } from 'aws-lambda';
-import * as mysql from 'mysql2/promise';
-import * as AWS from 'aws-sdk';
 
 let serverlessExpressInstance;
 
