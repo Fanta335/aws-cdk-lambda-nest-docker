@@ -109,6 +109,7 @@ export class NestAppStack extends Stack {
       debugLogging: true,
       vpc,
       securityGroups: [dbConnectionGroup],
+      requireTLS: false,
     });
 
     const iamRoleForLambda = new iam.Role(this, "iamRoleForLambda", {
