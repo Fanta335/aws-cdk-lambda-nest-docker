@@ -2,7 +2,7 @@ import * as AWS from 'aws-sdk';
 
 export const getSecretsValuesFromAwsSecretManager = async () => {
   const secretsManager = new AWS.SecretsManager({
-    region: 'ap-northeast-1',
+    region: process.env.AWS_REGION,
   });
   const response = await secretsManager
     .getSecretValue({
