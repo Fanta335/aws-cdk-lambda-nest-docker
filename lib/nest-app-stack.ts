@@ -88,6 +88,7 @@ export class NestAppStack extends Stack {
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
       },
+      // multiAz: true,
       securityGroups: [dbConnectionGroup],
       removalPolicy: RemovalPolicy.DESTROY,
       deletionProtection: false,
