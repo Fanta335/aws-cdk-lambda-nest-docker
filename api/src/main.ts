@@ -8,6 +8,8 @@ import {
   Context,
   APIGatewayProxyResult,
 } from 'aws-lambda';
+import { config, SecretsManager } from 'aws-sdk';
+import { ConfigService } from '@nestjs/config';
 
 let serverlessExpressInstance;
 
@@ -26,6 +28,34 @@ const bootstrapServer = async (event: any, context: any) => {
     );
     next();
   });
+
+  // const configService = nestApp.get(ConfigService);
+  // const getSecretsValuesFromAwsSecretManager = async () => {
+  //   const secretsManager = new SecretsManager({
+  //     region: process.env.AWS_REGION,
+  //   });
+  //   const response = await secretsManager
+  //     .getSecretValue({
+  //       SecretId: configService.get('IAM_SECRET_NAME'),
+  //     })
+  //     .promise();
+
+  //   const { accessKey, secretAccessKey } = JSON.parse(
+  //     response.SecretString ?? '',
+  //   );
+
+  //   return { accessKey, secretAccessKey };
+  // };
+  // const { accessKey, secretAccessKey } =
+  //   await getSecretsValuesFromAwsSecretManager();
+  // config.update({
+  //   credentials: {
+  //     accessKeyId: accessKey,
+  //     secretAccessKey: secretAccessKey,
+  //   },
+  //   region: configService.get('AWS_REGION'),
+  // });
+
   await nestApp.init();
   serverlessExpressInstance = serverlessExpress({ app: expressApp });
   return serverlessExpressInstance(event, context);
