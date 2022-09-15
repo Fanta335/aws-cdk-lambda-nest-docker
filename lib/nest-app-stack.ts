@@ -93,10 +93,6 @@ export class NestAppStack extends Stack {
       },
     });
 
-    // 確認用
-    new CfnOutput(this, "access_key", { value: accessKey.ref });
-    new CfnOutput(this, "secret_access_key", { value: secretAccessKey });
-
     // RDSの認証情報
     const databaseCredentialsSecret = new secrets.Secret(this, "DBCredentialsSecret", {
       secretName: id + "-rds-credentials",
@@ -168,6 +164,7 @@ export class NestAppStack extends Stack {
         PROXY_ENDPOINT: proxy.endpoint,
         RDS_SECRET_NAME: databaseCredentialsSecret.secretName,
         IAM_SECRET_NAME: iamUserForS3CredentialsSecret.secretName,
+        S3_BUCKET_NAME: s3Bucket.bucketName,
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
       },
       memorySize: 128,
@@ -182,6 +179,20 @@ export class NestAppStack extends Stack {
       vpc: vpc,
       service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
     });
+
+    // Lambda関数からS3にアクセスするためのVPCエンドポイント
+    const s3VpcEndpoint = new ec2.GatewayVpcEndpoint(this, "S3VpcEndpoint", {
+      vpc: vpc,
+      service: ec2.GatewayVpcEndpointAwsService.S3,
+      subnets: [{ subnetType: ec2.SubnetType.PRIVATE_ISOLATED }],
+    });
+    s3VpcEndpoint.addToPolicy(
+      new iam.PolicyStatement({
+        principals: [new iam.AnyPrincipal()],
+        actions: ["*"],
+        resources: ["*"],
+      })
+    );
 
     // API Gateway
     const restApi = new apigw.RestApi(this, `NestAppApiGateway`, {
