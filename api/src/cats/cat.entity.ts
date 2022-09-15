@@ -13,6 +13,9 @@ export class Cat {
   @Column()
   name: string;
 
+  @Column({ nullable: true })
+  avatar: string;
+
   @CreateDateColumn()
   createdAt: Date;
 }
